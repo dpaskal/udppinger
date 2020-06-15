@@ -39,12 +39,12 @@ int main() {
 	// random generator
 	srand(time(0));
 
-        while (1) {
+		while (1) {
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
 		buffer[n] = '\0';
-
+		std::cout << "Received: " << buffer << std::endl;
 		//If a random number in the range of 0 to 10 is less than 4,
 		//we consider the packet lost and do not respond
 		if (rand()%10 < 4) continue;
@@ -53,5 +53,5 @@ int main() {
 		sendto(sockfd, (const char *)buffer, strlen(buffer), 
 			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
 	}
-	return 0; 
-} 
+	return 0;
+}

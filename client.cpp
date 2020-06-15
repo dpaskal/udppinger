@@ -11,8 +11,9 @@
 #define PORT	 12000
 
 int main() {
-	int sockfd;
-	char buffer[1024];
+	int sockfd, n;
+	// socklen_t len;
+	char buffer[1024] = "Hello World";
 	struct sockaddr_in servaddr;
 
 	// Create a UDP socket
@@ -25,8 +26,20 @@ int main() {
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
 
-	sendto(sockfd, (char *) buffer, sizeof(buffer),
-		MSG_CONFIRM, (struct sockaddr *) &servaddr, &len);
+	// Send a packet to server
+	n = sendto(sockfd, (char *) buffer, sizeof(buffer),
+		MSG_CONFIRM, (struct sockaddr *) &servaddr, sizeof(servaddr));
+	if (n<0){
+		std::cout << "sendto failed: " << strerror(errno) << std::endl;
+		exit(0);
+	}
+	std::cout << n << " bytes sent." << std::endl;
 
+	close(sockfd);
 	return 0;
 }
+
+// void send(int sockfd, struct sockaddr_in servaddr) {
+// 	return sendto(sockfd, (char *) buffer, sizeof(buffer),
+// 		MSG_CONFIRM, (struct sockaddr *) &servaddr, len);
+// }
