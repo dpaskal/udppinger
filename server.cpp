@@ -44,7 +44,7 @@ int main() {
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
 		buffer[n] = '\0';
-		std::cout << "Received: " << buffer << std::endl;
+		std::cout << "Server received: " << buffer << std::endl;
 		//If a random number in the range of 0 to 10 is less than 4,
 		//we consider the packet lost and do not respond
 		if (rand()%10 < 4) continue;
