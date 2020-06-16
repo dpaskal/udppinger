@@ -19,6 +19,9 @@ int main() {
 	socklen_t len;
 	char buffer[1024] = "Hello World";
 	struct sockaddr_in servaddr;
+	struct timeval tv;
+	tv.tv_sec = 1;
+	tv.tv_usec = 500000;
 
 	// Create a UDP socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -29,6 +32,12 @@ int main() {
 	servaddr.sin_family = AF_INET; // IPv4
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
+	
+	// Set timeout socket option
+	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval)) < 0) {
+		std::cout << "setsockopt failed: " << strerror(errno) << std::endl;
+		exit(0);
+	}
 
 	for(int i=0; i<MAX_MSGS; i++) {
 		auto start = std::chrono::high_resolution_clock::now(); // timer start
