@@ -29,7 +29,7 @@ int main() {
 	memset(&cliaddr, 0, sizeof(cliaddr)); 
 	
 	// Fill server information 
-	servaddr.sin_family = AF_INET; // IPv4 
+	servaddr.sin_family = AF_INET; // IPv4
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
 	

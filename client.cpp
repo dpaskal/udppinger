@@ -20,8 +20,8 @@ int main() {
 	char buffer[1024] = "Hello World";
 	struct sockaddr_in servaddr;
 	struct timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = 999999;
+	tv.tv_sec = 1;	// set timeout delay to 1 second and 0 microsends
+	tv.tv_usec = 0;
 
 	// Create a UDP socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -34,7 +34,8 @@ int main() {
 	servaddr.sin_port = htons(PORT); // port number
 	
 	// Set timeout socket option
-	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval)) < 0) {
+	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO,
+		(char *)&tv, sizeof(struct timeval)) < 0) {
 		std::cout << "setsockopt failed: " << strerror(errno) << std::endl;
 		exit(0);
 	}
