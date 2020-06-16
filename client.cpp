@@ -20,8 +20,8 @@ int main() {
 	char buffer[1024] = "Hello World";
 	struct sockaddr_in servaddr;
 	struct timeval tv;
-	tv.tv_sec = 1;
-	tv.tv_usec = 500000;
+	tv.tv_sec = 0;
+	tv.tv_usec = 999999;
 
 	// Create a UDP socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
