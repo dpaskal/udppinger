@@ -57,6 +57,10 @@ int main() {
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, (struct sockaddr *) &servaddr, &len);
 		if (n < 0) {
+			if (errno == 11) {
+				std::cout << "packet lost" << std::endl;
+				continue;
+			}
 			std::cout << "recvfrom failed: " << strerror(errno) << std::endl;
 			continue;
 		}

@@ -57,7 +57,7 @@ int main() {
 		//we consider the packet lost and do not respond
 		if (rand()%10 < 4) continue;
 
-		strcpy(buffer, "pong");	// just to verify client received a message.
+		strcpy(buffer, "pong");	// just to verify client received correct message.
 		//Otherwise, the server responds
 		sendto(sockfd, (const char *)buffer, strlen(buffer), 
 			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
