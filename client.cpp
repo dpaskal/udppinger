@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	int sockfd, n;
-	char buffer[1024] = "ping";
+	char buffer[1024];
 	struct sockaddr_in servaddr;
 	struct timeval tv;
 	tv.tv_sec = 1;	// set timeout delay to 1 second and 0 microsends
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 		// Send a packet to server
 		n = sendto(sockfd, (char *) buffer, sizeof(buffer),
 			MSG_CONFIRM, (struct sockaddr *) &servaddr, sizeof(servaddr));
-		if (n<0){	// check for error
+		if (n < 0){ // check for -1
 			std::cout << "sendto failed: " << strerror(errno) << std::endl;
 			close(sockfd);
 			exit(EXIT_FAILURE);
@@ -65,11 +65,12 @@ int main(int argc, char** argv) {
 		// Receive return packet from server
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, (struct sockaddr *) &servaddr, &len);
-		if (n < 0) {
-			if (errno == 11) {
-				std::cout << "packet lost" << std::endl;
+		if (n < 0) { // check for -1
+			if (errno == EAGAIN) { // Check for timeout
+				std::cout << "Waited 1 second, assuming packet is lost." << std::endl;
 				continue;
 			}
+			// Otherwise print error and continue
 			std::cout << "recvfrom failed: " << strerror(errno) << std::endl;
 			continue;
 		}
@@ -82,7 +83,7 @@ int main(int argc, char** argv) {
 		double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count();
 		duration *= 1e-9; // move nano seconds to seconds
 
-		// Report 
+		// Report the Round Trip Time
 		std::cout << "RTT_" << i+1 << " = " << duration << std::setprecision(9) << "s" << std::endl;
 
 	}
