@@ -12,7 +12,7 @@
 #include <netdb.h>		// for gethostbyname
 
 
-#define PORT		54444
+#define PORT		12000
 #define MAX_MSGS	10
 
 int main(int argc, char** argv) {
