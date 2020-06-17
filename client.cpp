@@ -14,13 +14,18 @@
 #define PORT		12000
 #define MAX_MSGS	10
 
-int main() {
+int main(int argc, char** argv) {
+	if (argc != 2) {
+		std::cout << "Usage: ./client <ipv4 address>" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	int sockfd, n;
 	char buffer[1024] = "ping";
 	struct sockaddr_in servaddr;
 	struct timeval tv;
 	tv.tv_sec = 1;	// set timeout delay to 1 second and 0 microsends
 	tv.tv_usec = 0;
+	
 
 	// Create a UDP socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -30,7 +35,7 @@ int main() {
 
 	// Fill server information
 	servaddr.sin_family = AF_INET; 			// IPv4
-	servaddr.sin_addr.s_addr = INADDR_ANY; 	// localhost
+	servaddr.sin_addr.s_addr = inet_addr(argv[1]);//INADDR_ANY; 	// localhost
 	servaddr.sin_port = htons(PORT); 		// port number
 	
 	// Set timeout socket option
