@@ -17,7 +17,7 @@
 int main() {
 	int sockfd, n;
 	socklen_t len;
-	char buffer[1024] = "Hello World";
+	char buffer[1024] = "ping";
 	struct sockaddr_in servaddr;
 	struct timeval tv;
 	tv.tv_sec = 1;	// set timeout delay to 1 second and 0 microsends
@@ -54,7 +54,13 @@ int main() {
 		// Receive return packet from server
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, (struct sockaddr *) &servaddr, &len);
+		// if (n < 0) {
+		// 	std::cout << "Packet lost: " << strerror(errno) << std::endl;
+		// 	continue;
+		// }
 		buffer[n] = '\0';
+
+		std::cout  << buffer << std::endl;
 
 		// End and calculate elapsed time
 		auto end = std::chrono::high_resolution_clock::now();
