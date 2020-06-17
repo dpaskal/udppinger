@@ -7,7 +7,7 @@
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
-#include <chrono>		// for timing
+#include <chrono>		// for timer
 #include <iomanip> 		// for setprecision
 
 
@@ -37,35 +37,34 @@ int main() {
 	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO,
 		(char *)&tv, sizeof(struct timeval)) < 0) {
 		std::cout << "setsockopt failed: " << strerror(errno) << std::endl;
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 
 	for(int i=0; i<MAX_MSGS; i++) {
 		auto start = std::chrono::high_resolution_clock::now(); // timer start
+
 		// Send a packet to server
 		n = sendto(sockfd, (char *) buffer, sizeof(buffer),
 			MSG_CONFIRM, (struct sockaddr *) &servaddr, sizeof(servaddr));
-		if (n<0){
+		if (n<0){	// check for error
 			std::cout << "sendto failed: " << strerror(errno) << std::endl;
-			exit(0);
+			exit(EXIT_FAILURE);
 		}
-		// std::cout << n << " bytes sent." << std::endl;
 
+		// Receive return packet from server
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, (struct sockaddr *) &servaddr, &len);
 		buffer[n] = '\0';
-		// std::cout << "Client received: " << buffer << std::endl;
-		auto end = std::chrono::high_resolution_clock::now(); // timer end
+
+		// End and calculate elapsed time
+		auto end = std::chrono::high_resolution_clock::now();
 		double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count();
 		duration *= 1e-9; // move nano seconds to seconds
+
+		// Report 
 		std::cout << "RTT_" << i+1 << " = " << duration << std::setprecision(9) << "s" << std::endl;
 
 	}
 	close(sockfd);
 	return 0;
 }
-
-// void send(int sockfd, struct sockaddr_in servaddr) {
-// 	return sendto(sockfd, (char *) buffer, sizeof(buffer),
-// 		MSG_CONFIRM, (struct sockaddr *) &servaddr, len);
-// }
