@@ -12,7 +12,7 @@
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
 
-#define PORT	 12000
+#define PORT	54444
 
 
 int main() {

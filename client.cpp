@@ -9,9 +9,10 @@
 #include <netinet/in.h> 
 #include <chrono>		// for timer
 #include <iomanip> 		// for setprecision
+#include <netdb.h>		// for gethostbyname
 
 
-#define PORT		12000
+#define PORT		54444
 #define MAX_MSGS	10
 
 int main(int argc, char** argv) {
@@ -23,9 +24,9 @@ int main(int argc, char** argv) {
 	char buffer[1024];
 	struct sockaddr_in servaddr;
 	struct timeval tv;
-	tv.tv_sec = 1;	// set timeout delay to 1 second and 0 microsends
-	tv.tv_usec = 0;
-	
+	tv.tv_sec = 1;	// set timeout delay to 1 second 
+	tv.tv_usec = 0; // and 0 microsends
+	struct hostent *hn; // for translating ip addresses
 
 	// Create a UDP socket
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
@@ -37,9 +38,15 @@ int main(int argc, char** argv) {
 	memset(&servaddr, 0, sizeof(servaddr));
 	socklen_t len = sizeof(servaddr); // Needed for recvfrom
 
+
+	// Translate input to hostent struct
+	// https://man7.org/linux/man-pages/man3/gethostbyname.3.html
+	if ((hn = gethostbyname(argv[1])) == NULL )
+		return 1; // error checking gethostbyname
+
 	// Fill server information
-	servaddr.sin_family = AF_INET; 			// IPv4
-	servaddr.sin_addr.s_addr = inet_addr(argv[1]); // create address from user input
+	servaddr.sin_family = AF_INET; 	// IPv4
+	memcpy(&servaddr.sin_addr, hn->h_addr, hn->h_length); // set ip address
 	servaddr.sin_port = htons(PORT); 		// port number
 	
 	// Set timeout socket option
