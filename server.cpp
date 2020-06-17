@@ -23,7 +23,11 @@ int main() {
 	
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+		std::cout << "socket failed: " << strerror(errno) << std::endl;
+		close(sockfd);
+		exit(EXIT_FAILURE);
+	}
 	
 	memset(&servaddr, 0, sizeof(servaddr)); 
 	memset(&cliaddr, 0, sizeof(cliaddr)); 
@@ -33,8 +37,12 @@ int main() {
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
 	
-	// Bind the socket with the server address 
-	bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr));
+	// Bind the socket with the server address
+	if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+		std::cout << "bind failed: " << strerror(errno) << std::endl;
+		close(sockfd);
+		exit(EXIT_FAILURE);
+	}
 	
 	// random generator
 	srand(time(0));

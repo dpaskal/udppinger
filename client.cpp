@@ -16,7 +16,6 @@
 
 int main() {
 	int sockfd, n;
-	socklen_t len;
 	char buffer[1024] = "ping";
 	struct sockaddr_in servaddr;
 	struct timeval tv;
@@ -27,16 +26,18 @@ int main() {
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	memset(&servaddr, 0, sizeof(servaddr));
+	socklen_t len = sizeof(servaddr);
 
 	// Fill server information
-	servaddr.sin_family = AF_INET; // IPv4
-	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
-	servaddr.sin_port = htons(PORT); // port number
+	servaddr.sin_family = AF_INET; 			// IPv4
+	servaddr.sin_addr.s_addr = INADDR_ANY; 	// localhost
+	servaddr.sin_port = htons(PORT); 		// port number
 	
 	// Set timeout socket option
 	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO,
 		(char *)&tv, sizeof(struct timeval)) < 0) {
 		std::cout << "setsockopt failed: " << strerror(errno) << std::endl;
+		close(sockfd);
 		exit(EXIT_FAILURE);
 	}
 
@@ -48,16 +49,17 @@ int main() {
 			MSG_CONFIRM, (struct sockaddr *) &servaddr, sizeof(servaddr));
 		if (n<0){	// check for error
 			std::cout << "sendto failed: " << strerror(errno) << std::endl;
+			close(sockfd);
 			exit(EXIT_FAILURE);
 		}
 
 		// Receive return packet from server
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, (struct sockaddr *) &servaddr, &len);
-		// if (n < 0) {
-		// 	std::cout << "Packet lost: " << strerror(errno) << std::endl;
-		// 	continue;
-		// }
+		if (n < 0) {
+			std::cout << "recvfrom failed: " << strerror(errno) << std::endl;
+			continue;
+		}
 		buffer[n] = '\0';
 
 		std::cout  << buffer << std::endl;
