@@ -28,14 +28,18 @@ int main(int argc, char** argv) {
 	
 
 	// Create a UDP socket
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+		std::cout << "socket failed: " << strerror(errno) << std::endl;
+		close(sockfd);
+		exit(EXIT_FAILURE);
+	}
 
 	memset(&servaddr, 0, sizeof(servaddr));
-	socklen_t len = sizeof(servaddr);
+	socklen_t len = sizeof(servaddr); // Needed for recvfrom
 
 	// Fill server information
 	servaddr.sin_family = AF_INET; 			// IPv4
-	servaddr.sin_addr.s_addr = inet_addr(argv[1]);//INADDR_ANY; 	// localhost
+	servaddr.sin_addr.s_addr = inet_addr(argv[1]); // create address from user input
 	servaddr.sin_port = htons(PORT); 		// port number
 	
 	// Set timeout socket option
@@ -48,7 +52,7 @@ int main(int argc, char** argv) {
 
 	for(int i=0; i<MAX_MSGS; i++) {
 		auto start = std::chrono::high_resolution_clock::now(); // timer start
-
+		strcpy(buffer, "ping"); // Set message to be sent
 		// Send a packet to server
 		n = sendto(sockfd, (char *) buffer, sizeof(buffer),
 			MSG_CONFIRM, (struct sockaddr *) &servaddr, sizeof(servaddr));
